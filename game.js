@@ -7,6 +7,7 @@ var started = true;
 
 function nextSequence(){
     // generation of random number between 0 and 3
+    userClickedPattern = [];
     var randomNumber = Math.floor(Math.random()*4);
     var randomChosenColour = buttonColours[randomNumber];
     $('#'+randomChosenColour).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
@@ -22,6 +23,13 @@ function nextSequence(){
 }
 
 
+function startOver()
+{       
+    // resetting these values
+        started = true;
+        gamePattern = [];
+        level = 0;
+}
 
 // It checks the userClickedPattern and gamePattern 
 function checkAnswer(currentLevel){
@@ -31,10 +39,17 @@ function checkAnswer(currentLevel){
         console.log("success");
         setTimeout(()=>{
             nextSequence();
-            userClickedPattern = [];
         }, 1000);
     } else {
-        console.log("Failure");
+        playMusic("wrong");
+        $('#level-title').text ('Game over ! Press any key to restart');
+        $('body').addClass('game-over');
+        // remove 'game-over' class after 200 milliseconds
+        setTimeout(function() {
+            $('body').removeClass('game-over');
+    }, 200);
+      
+        startOver();
         
     }
 }

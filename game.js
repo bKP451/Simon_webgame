@@ -7,26 +7,52 @@ var started = true;
 
 function nextSequence(){
     // generation of random number between 0 and 3
+    userClickedPattern = [];
     var randomNumber = Math.floor(Math.random()*4);
+    var randomChosenColour = buttonColours[randomNumber];
+    $('#'+randomChosenColour).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+    console.log(randomChosenColour);
+
+    gamePattern.push(randomChosenColour);
+    playMusic(randomChosenColour);
+    console.log(`Game pattern is ${gamePattern}`);
     // on first key press this block is executed
-    while(started){
-        $('#'+randomChosenColour).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
-        playMusic(randomChosenColour);
-        started = false;
-        }
-    $('h1').text('Level '+ level);
-    return randomNumber;
+    $('#level-title').text ('level ' + level);
+    level += 1;
+    
 }
 
 
-// selection of random color from buttonColours Array
-var randomChosenColour = buttonColours[nextSequence()];
-console.log(randomChosenColour);
+function startOver()
+{       
+    // resetting these values
+        started = true;
+        gamePattern = [];
+        level = 0;
+}
 
-gamePattern.push(randomChosenColour);
-
- 
-
+// It checks the userClickedPattern and gamePattern 
+function checkAnswer(currentLevel){
+    console.log(userClickedPattern);
+    console.log(gamePattern);
+    if (userClickedPattern.toString() === gamePattern.toString()){
+        console.log("success");
+        setTimeout(()=>{
+            nextSequence();
+        }, 1000);
+    } else {
+        playMusic("wrong");
+        $('#level-title').text ('Game over ! Press any key to restart');
+        $('body').addClass('game-over');
+        // remove 'game-over' class after 200 milliseconds
+        setTimeout(function() {
+            $('body').removeClass('game-over');
+    }, 200);
+      
+        startOver();
+        
+    }
+}
 
 function playMusic(colorMusic){
     fileName = 'sounds/'+colorMusic+'.mp3';
@@ -39,36 +65,28 @@ function playMusic(colorMusic){
 
 // this block of code should be executed for a single time
 $(document).keypress(function(){
-        // animate a flash to the button
+    while(started){
         nextSequence();
-        // console.log("hi");
-        
-    })
-
-// JS
-
-// console.log(document.querySelectorAll('.btn').length);
-
-// for(var i =0; i< document.querySelectorAll('.btn').length; i++){
-//     document.querySelectorAll('.btn')[i].addEventListener('click', function(){
-//         console.log(this);
-//         userClickedPattern.push(this.id);
-//         console.log(userClickedPattern);
-//     })
-//     ;
-// }
-
+        started = false;
+    }
+});
+     
 // now I will do the above using jQuery
 $('.btn').click(function(){
     // console.log($(this).attr('id'));
     var buttonColor = $(this).attr('id');
     userClickedPattern.push(buttonColor);
     playMusic(buttonColor);
-    console.log(userClickedPattern);
+    console.log(`User's click pattern is ${userClickedPattern}`);
     animatePress(buttonColor);
     setTimeout(function() {
             $('#'+ buttonColor).removeClass('pressed');
     }, 100);
+    // check whether the user has chosen their answer
+    // the length of userClickedPattern and gamePattern should be same
+    if(userClickedPattern.length === gamePattern.length) {
+        checkAnswer(level)
+    }
 })
 
 
